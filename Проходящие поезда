@@ -1,0 +1,39 @@
+import requests
+import datetime as dt
+
+API_KEY = "4e31bf50-3942-4f78-9ab4-fefad5dbe15c"
+
+def find_ticket_to_hogwarts(from_p: str, to_p: str, date_p: str):
+    base_url = "https://api.rasp.yandex.net/v3.0/search/"
+
+
+    # Параметры запроса — цивилизованные люди делают так,
+    # а не склеивают URL
+    params = {
+        "apikey": API_KEY,
+        "format": "json",
+        "from": from_p,
+        "to": to_p,
+        "lang": "ru_RU",
+        "date": date_p
+        }
+
+    response = requests.get(base_url, params=params)
+    data = response.json()
+
+    # Давайте посмотрим на первый найденный поезд
+    if data.get('segments'):
+        sett = set()
+        for i in range(len(data['segments'])):
+            train = data['segments'][i]['thread']['title']
+            if data['segments'][i]['thread']['title'] not in sett:
+                sett.add(data['segments'][i]['thread']['title'])
+        for i in sorted(sett):
+            print(i)
+
+    else:
+        print("🤷‍♂️ Поездов нет. Придётся идти пешком. Или на метле.")
+from_p, to_p = map(str, input().split())
+date_p = input()
+
+find_ticket_to_hogwarts(from_p, to_p, date_p)
